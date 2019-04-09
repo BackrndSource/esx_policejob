@@ -1338,19 +1338,39 @@ function OpenBuyWeaponsMenu()
 				OpenWeaponComponentShop(data.current.components, data.current.name, menu)
 			end
 		else
-			ESX.TriggerServerCallback('esx_policejob:buyWeapon', function(bought)
-				if bought then
-					if data.current.price > 0 then
-						ESX.ShowNotification(_U('armory_bought', data.current.weaponLabel, ESX.Math.GroupDigits(data.current.price)))
+			if Config.EnableArmoryManagement then
+
+				ESX.TriggerServerCallback('esx_policejob:buyWeaponArmory', function(hasEnoughMoney)
+
+		          if hasEnoughMoney then
+		            ESX.TriggerServerCallback('esx_policejob:addArmoryWeapon', function()
+		            	menu.close()
+		              	OpenBuyWeaponsMenu()
+		            end, data.current.name, false)
+		          else
+		            ESX.ShowNotification(_U('armory_money'))
+		          end
+
+		        end, data.current.price)
+
+			else
+
+				ESX.TriggerServerCallback('esx_policejob:buyWeapon', function(bought)
+
+					if bought then
+						if data.current.price > 0 then
+							ESX.ShowNotification(_U('armory_bought', data.current.weaponLabel, ESX.Math.GroupDigits(data.current.price)))
+						end
+
+						menu.close()
+
+						OpenBuyWeaponsMenu()
+					else
+						ESX.ShowNotification(_U('armory_money'))
 					end
 
-					menu.close()
-
-					OpenBuyWeaponsMenu()
-				else
-					ESX.ShowNotification(_U('armory_money'))
-				end
-			end, data.current.name, 1)
+				end, data.current.name, 1)
+			end
 		end
 
 	end, function(data, menu)
