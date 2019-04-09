@@ -374,6 +374,17 @@ ESX.RegisterServerCallback('esx_policejob:removeArmoryWeapon', function(source, 
 
 end)
 
+ESX.RegisterServerCallback('esx_policejob:buyWeaponArmory', function(source, cb, amount)
+  	TriggerEvent('esx_addonaccount:getSharedAccount', 'society_police', function(account)
+	    if account.money >= amount then
+	      account.removeMoney(amount)
+	      cb(true)
+	    else
+	      cb(false)
+	    end
+  	end)
+end)
+
 ESX.RegisterServerCallback('esx_policejob:buyWeapon', function(source, cb, weaponName, type, componentNum)
 	local xPlayer = ESX.GetPlayerFromId(source)
 	local authorizedWeapons, selectedWeapon = Config.AuthorizedWeapons[xPlayer.job.grade_name]
